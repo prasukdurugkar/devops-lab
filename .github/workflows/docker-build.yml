@@ -23,8 +23,8 @@ jobs:
       - name: Push backend Images
         run: docker push prashxx70/devops-backend
 
-      - name: Build docker Images
-        run:  docker build -t prashxx70 devops-frontend ./frontend 
+      - name: Build frontend Images
+        run:  docker build -t prashxx70/devops-frontend ./frontend 
       
       - name: Push docker Images
         run: docker push prashxx70/devops-frontend
