@@ -14,6 +14,16 @@ COPY . .
 # Build Next.js app
 RUN npm run build
 
+# Ensure a runtime `next.config.js` exists for the final stage.
+# Prefer an existing JS/CJS config; otherwise create an empty module so COPY won't fail.
+RUN if [ -f next.config.js ]; then \
+			cp next.config.js next.config.runtime.js; \
+		elif [ -f next.config.cjs ]; then \
+			cp next.config.cjs next.config.runtime.js; \
+		else \
+			echo "module.exports = {}" > next.config.runtime.js; \
+		fi
+
 # --------- Stage 2: Production ---------
 FROM node:20-alpine
 
@@ -27,7 +37,7 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-# next.config.ts is used in this project; do not copy a non-existent next.config.js
+COPY --from=builder /app/next.config.runtime.js ./next.config.js
 
 EXPOSE 3000
 
